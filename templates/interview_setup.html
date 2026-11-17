@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Interview Practice | NEXAs{% endblock %}
+{% block content %}
+<section class="page interview-access-page">
+  <div class="learner-eyebrow"><span class="creator-eyebrow-dot"></span> LEARNER WORKSPACE</div>
+  <div class="head learner-access-hero">
+    <div>
+      <h1>Choose how you want to practice.</h1>
+      <p>Practice on your own whenever you like, or enter an active interview code from your joined Creator section.</p>
+    </div>
+  </div>
+
+  <div class="grid interview-options">
+    <section class="panel interview-option solo-option">
+      <div class="interview-option-heading">
+        <span class="creator-step creator-step-alt">01</span>
+        <div><label>SELF-PRACTICE</label><h2>Start without a code</h2><p>Choose your topic and interview style. Your answers are scored and saved to your history.</p></div>
+      </div>
+      <form class="learner-form" method="post">
+        <input type="hidden" name="practice_type" value="solo">
+        <div class="creator-question-fields">
+          <label>Branch<select name="branch">{% for branch in branches %}<option>{{ branch }}</option>{% endfor %}</select></label>
+          <label>Difficulty<select name="level">{% for level in levels %}<option>{{ level }}</option>{% endfor %}</select></label>
+        </div>
+        <label>Interview mode<select name="mode">{% for mode in modes %}<option>{{ mode }}</option>{% endfor %}</select></label>
+        <label class="check creator-check"><input type="checkbox" name="strict" checked><span><b>Strict evaluation</b><small>Use consistent scoring criteria for your answers.</small></span></label>
+        <button class="btn primary wide">Start self-practice</button>
+      </form>
+    </section>
+
+    <section class="panel interview-option creator-option">
+      <div class="interview-option-heading">
+        <span class="creator-step">02</span>
+        <div><label>CREATOR INTERVIEW</label><h2>Use a section code first</h2><p>Creator interview codes are available only after joining that Creator's section.</p></div>
+      </div>
+      {% if section %}
+      <div class="section-connected"><span class="connected-dot"></span><span><small>SECTION CONNECTED</small><b>{{ section.name }}</b></span></div>
+      <form class="learner-form interview-code-form" method="post">
+        <input type="hidden" name="practice_type" value="creator">
+        <label>Interview access code<input name="interview_code" maxlength="32" autocomplete="off" placeholder="Enter the code shared by your Creator" required></label>
+        <div class="mode-note"><b>Access is verified securely.</b><br>The code must be active and belong to your joined section.</div>
+        <button class="btn primary wide">Validate creator code</button>
+      </form>
+      {% else %}
+      <div class="section-required"><span class="section-required-icon">↗</span><div><b>Not in a Creator section yet</b><p>Enter the Student Join Code from your Creator to unlock their interview codes. Self-practice is still available.</p></div></div>
+      <form class="learner-form section-join-form" method="post" action="/student/join">
+        <label>Student section code<input name="join_code" maxlength="32" autocomplete="off" placeholder="Enter your Student Join Code" required></label>
+        <button class="btn primary wide">Join section</button>
+      </form>
+      {% endif %}
+    </section>
+  </div>
+
+  <div class="interview-safety-note"><span>✦</span> Your practice sessions, answers and results are saved to your learner account.</div>
+</section>
+{% endblock %}

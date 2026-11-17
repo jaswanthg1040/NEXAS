@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Creator Studio | NEXAs{% endblock %}
+{% block content %}
+<section class="page creator-page">
+  <div class="creator-eyebrow"><span class="creator-eyebrow-dot"></span> CREATOR STUDIO <span class="creator-eyebrow-divider">/</span> INTERVIEW WORKSPACE</div>
+  <div class="head creator-hero">
+    <div>
+      <h1>Build better interviews.<br><em>Share one code.</em></h1>
+      <p>Design interview sessions, curate questions, and bring your learners together in one place.</p>
+    </div>
+    <span class="faculty-badge creator-badge">CREATOR ACCESS</span>
+  </div>
+
+  <section class="panel creator-profile">
+    <div class="creator-profile-person">
+      <span class="creator-avatar">{{ me.name[:1]|upper }}</span>
+      <div><small>Workspace owner</small><b>{{ me.name }}</b></div>
+    </div>
+    <div class="creator-profile-details">
+      <span><small>Department</small><b>{{ profile.department or 'Not set' }}</b></span>
+      <span><small>Designation</small><b>{{ profile.designation or 'Creator' }}</b></span>
+      <span><small>University</small><b>{{ profile.university or 'Not set' }}</b></span>
+    </div>
+  </section>
+
+  <div class="grid creator-grid">
+    <section class="panel creator-panel">
+      <div class="creator-panel-heading">
+        <span class="creator-step">01</span>
+        <div><label>CREATE INTERVIEW</label><h2>Generate an access code</h2><p>Set the format and difficulty for your next session.</p></div>
+      </div>
+      <form class="creator-form" method="post" action="/creator/interview">
+        <label>Branch<select name="branch">{% for branch in branches %}<option>{{ branch }}</option>{% endfor %}</select></label>
+        <label>Difficulty<select name="level">{% for level in levels %}<option>{{ level }}</option>{% endfor %}</select></label>
+        <label>Interview mode<select name="mode">{% for mode in modes %}<option>{{ mode }}</option>{% endfor %}</select></label>
+        <label class="check creator-check"><input type="checkbox" name="strict" checked><span><b>Strict evaluation</b><small>Apply consistent scoring criteria to answers.</small></span></label>
+        <button class="btn primary wide">Create interview code</button>
+      </form>
+    </section>
+
+    <section class="panel creator-panel">
+      <div class="creator-panel-heading">
+        <span class="creator-step creator-step-alt">02</span>
+        <div><label>QUESTION BANK</label><h2>Add a curated question</h2><p>Write a custom prompt for your interview sessions.</p></div>
+      </div>
+      <form class="creator-form" method="post" action="/admin/question">
+        <div class="creator-question-fields">
+          <label>Branch<select name="branch">{% for branch in branches %}<option>{{ branch }}</option>{% endfor %}</select></label>
+          <label>Difficulty<select name="level">{% for level in levels %}<option>{{ level }}</option>{% endfor %}</select></label>
+        </div>
+        <label>Question<textarea name="question" rows="4" placeholder="Write a clear, high-quality interview question..." required></textarea></label>
+        <button class="btn primary wide">Add question</button>
+      </form>
+      <p class="creator-note"><span>TIP</span> NEXAs also includes a question bank for every supported branch.</p>
+    </section>
+  </div>
+
+  <div class="grid creator-grid creator-lists">
+    <section class="panel creator-panel">
+      <div class="creator-panel-heading compact">
+        <span class="creator-step">03</span>
+        <div><label>PERMANENT CODES</label><h2>Active interview codes</h2></div>
+      </div>
+      {% for code in codes %}
+      <div class="row creator-row">
+        <div><b class="join-code">{{ code.code }}</b><small>{{ code.branch }} · {{ code.level }} · {{ code.mode }}{% if code.strict_mode %} · Strict{% endif %}</small></div>
+        <form method="post" action="/creator/interview/{{ code.id }}/disable"><button class="btn small ghost">Disable</button></form>
+      </div>
+      {% else %}
+      <p class="empty creator-empty">No interview codes yet. Create one to get started.</p>
+      {% endfor %}
+    </section>
+
+    <section class="panel creator-panel">
+      <div class="creator-panel-heading compact">
+        <span class="creator-step creator-step-alt">04</span>
+        <div><label>SECTIONS</label><h2>Student join codes</h2></div>
+      </div>
+      <form class="creator-section-form" method="post" action="/admin/section">
+        <label>Section name<input name="name" placeholder="e.g. AIML Interview Lab" required></label>
+        <button class="btn primary">Create section</button>
+      </form>
+      {% for section in sections %}
+      <div class="row creator-row">
+        <div><b>{{ section.name }}</b><small>Share this code with your learners</small></div>
+        <code class="join-code">{{ section.invite_code }}</code>
+      </div>
+      {% else %}
+      <p class="empty creator-empty">Your sections and join codes will appear here.</p>
+      {% endfor %}
+    </section>
+  </div>
+
+  <section class="panel creator-panel creator-learners">
+    <div class="creator-panel-heading compact">
+      <span class="creator-step creator-step-alt">05</span>
+      <div><label>LEARNER MANAGEMENT</label><h2>Your section learners</h2><p>Review and approve learners who joined your sections.</p></div>
+    </div>
+    {% for student in students %}
+    <div class="row creator-row">
+      <div><b>{{ student.name }}</b><small>{{ student.email }} · {{ student.section_name }}</small></div>
+      {% if student.approved %}
+      <span class="creator-approved">Approved</span>
+      {% else %}
+      <form method="post" action="/admin/approve/{{ student.id }}"><button class="btn small primary">Approve learner</button></form>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="empty creator-empty">Learners who join your sections will appear here.</p>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

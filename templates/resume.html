@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Resume ATS | NEXAs{% endblock %}
+{% block content %}
+<section class="page resume-page">
+  <div class="learner-eyebrow"><span class="creator-eyebrow-dot"></span> RESUME STUDIO</div>
+  <div class="head resume-hero">
+    <div><h1>Make your resume<br><em>ready for what's next.</em></h1><p>Keep your resume versions in one place. NEXAs checks for relevant skills and gives you a quick ATS-style score.</p></div>
+    <span class="resume-hero-mark">CV</span>
+  </div>
+
+  <section class="panel resume-upload-panel">
+    <div class="resume-upload-copy">
+      <span class="creator-step creator-step-alt">01</span>
+      <div><label>ADD A RESUME</label><h2>Upload a PDF to check it</h2><p>Every upload is saved as a separate version with its own score and feedback.</p></div>
+    </div>
+    <form class="resume-upload-form" method="post" enctype="multipart/form-data">
+      <label class="resume-file-field">Choose a PDF resume<input type="file" name="resume" accept="application/pdf,.pdf" required></label>
+      <button class="btn primary">Analyze and save resume</button>
+    </form>
+  </section>
+
+  <div class="resume-list-heading"><div><label>YOUR LIBRARY</label><h2>Saved resume versions</h2></div><span class="resume-count">{{ rows|length }} saved</span></div>
+  <div class="resume-list">
+    {% for resume in rows %}
+    <article class="panel resume-entry">
+      <div class="resume-entry-main">
+        <div class="resume-file-icon">PDF</div>
+        <div class="resume-file-meta"><h3>{{ resume.filename }}</h3><small>Uploaded {{ resume.created_at }}</small><small>Last ATS check {{ resume.ats_checked_at or resume.created_at }}</small></div>
+      </div>
+      <div class="resume-score"><b>{{ "%.0f"|format(resume.ats_score or 0) }}</b><span>/100</span><small>ATS-style score</small></div>
+      <div class="resume-feedback">
+        <div><label>MATCHED SKILLS</label>
+          {% if resume.matched_skills %}
+          <div class="skill-chips">{% for skill in resume.matched_skills %}<span>{{ skill }}</span>{% endfor %}</div>
+          {% else %}<p class="muted">Add role-relevant skills to strengthen your profile.</p>{% endif %}
+        </div>
+        <p>{{ resume.suggestion }}</p>
+      </div>
+      <div class="resume-entry-actions">
+        <form method="post" action="/resume/{{ resume.id }}/recheck"><button class="btn small primary">Recheck ATS</button></form>
+        <a class="btn small ghost" href="/resume/{{ resume.id }}">Download PDF</a>
+      </div>
+    </article>
+    {% else %}
+    <div class="panel resume-empty"><span class="resume-empty-icon">↑</span><h3>Your resume library is ready.</h3><p>Upload your first PDF to get a score, spot matched skills, and keep a saved copy.</p></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

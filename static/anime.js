@@ -1,0 +1,1 @@
+(() => { const scene=document.querySelector('.anime-scene'); if(!scene) return; document.addEventListener('pointermove',e=>{if(innerWidth<900)return; const x=(e.clientX/innerWidth-.5)*2,y=(e.clientY/innerHeight-.5)*2; scene.style.transform=`rotateY(${x*6}deg) rotateX(${y*-4}deg)`;}); })();

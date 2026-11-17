@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Master | NEXAs{% endblock %}
+{% block content %}
+<section class="page master-page">
+  <div class="head master-page-head">
+    <div>
+      <h1>Master</h1>
+      <p>Manage accounts, question banks, sections and creator access.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    {% for branch, count in counts.items() %}
+    <div><small>{{ branch }} questions</small><b>{{ count }}</b></div>
+    {% endfor %}
+  </div>
+
+  <div class="grid master-forms">
+    <section class="panel master-form-panel">
+      <div class="master-form-heading">
+        <span class="master-form-number">01</span>
+        <div>
+          <h2>Create account</h2>
+          <p>Set up a learner, creator or master account.</p>
+        </div>
+      </div>
+      <form method="post" action="/master/create">
+        <label>Account type
+          <select name="kind">
+            <option value="student">Student</option>
+            <option value="admin">Creator</option>
+            <option value="master">Master</option>
+          </select>
+        </label>
+        <label>Name<input name="name" autocomplete="name" required></label>
+        <label>Email<input type="email" name="email" autocomplete="email" required></label>
+        <label>Password<input type="password" name="password" minlength="8" autocomplete="new-password" required></label>
+        <div class="master-optional-fields">
+          <label>Department<input name="department"></label>
+          <label>Designation<input name="designation"></label>
+          <label>University<input name="university"></label>
+          <label>Faculty ID<input name="faculty_id"></label>
+        </div>
+        <button class="btn primary wide">Create account</button>
+      </form>
+    </section>
+
+    <section class="panel master-form-panel">
+      <div class="master-form-heading">
+        <span class="master-form-number">02</span>
+        <div>
+          <h2>Add question</h2>
+          <p>Grow the shared interview question bank.</p>
+        </div>
+      </div>
+      <form method="post" action="/master/question">
+        <div class="master-question-options">
+          <label>Branch
+            <select name="branch">{% for branch in branches %}<option>{{ branch }}</option>{% endfor %}</select>
+          </label>
+          <label>Level
+            <select name="level">{% for level in levels %}<option>{{ level }}</option>{% endfor %}</select>
+          </label>
+        </div>
+        <label>Question<textarea name="question" rows="6" placeholder="Write a clear interview question..." required></textarea></label>
+        <button class="btn primary wide">Add question</button>
+      </form>
+    </section>
+  </div>
+
+  <section class="panel master-section">
+    <div class="master-section-heading">
+      <div><h2>Creator permissions</h2><p class="muted">Choose which capabilities each Creator can use.</p></div>
+    </div>
+    {% for creator in creators %}
+    <form method="post" action="/master/permissions" class="permission-row">
+      <input type="hidden" name="creator_id" value="{{ creator.id }}">
+      <div><b>{{ creator.name }}</b><small>{{ creator.email }}{% if creator.department %} · {{ creator.department }}{% endif %}</small></div>
+      <div class="permission-checks">
+        {% for permission in ['create_interviews', 'manage_questions', 'manage_learners', 'view_results', 'export_reports'] %}
+        <label><input type="checkbox" name="permission" value="{{ permission }}" {% set hit=tables.creator_permissions|selectattr('creator_id','equalto',creator.id)|selectattr('permission','equalto',permission)|selectattr('enabled')|list %}{% if hit %}checked{% endif %}>{{ permission.replace('_',' ') }}</label>
+        {% endfor %}
+      </div>
+      <button class="btn small primary">Save</button>
+    </form>
+    {% else %}
+    <p class="empty">No creators yet.</p>
+    {% endfor %}
+  </section>
+
+  <section class="panel master-section">
+    <div class="master-section-heading">
+      <div><h2>Recent users</h2><p class="muted">Remove an account and its associated user data. Other Master accounts can be removed too.</p></div>
+    </div>
+    <div class="master-table">
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Approved</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for user in tables.users[:30] %}
+          <tr>
+            <td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.email }}</td><td>{{ user.role }}</td>
+            <td>{{ 'Yes' if user.approved else 'No' }}</td>
+            <td>
+              {% if user.id != me.id %}
+              <form method="post" action="/master/delete/users/{{ user.id }}" onsubmit="return confirm({{ ('Permanently remove ' ~ user.name ~ ' and their associated data?')|tojson }});">
+                <button class="btn small danger" type="submit">Remove account</button>
+              </form>
+              {% else %}
+              <span class="protected-account">Signed in</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="empty">No user accounts found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+{% endblock %}

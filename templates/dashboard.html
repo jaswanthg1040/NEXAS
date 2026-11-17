@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Learner Dashboard | NEXAs{% endblock %}
+{% block content %}
+<section class="page learner-dashboard">
+  <div class="learner-eyebrow"><span class="creator-eyebrow-dot"></span> LEARNER WORKSPACE</div>
+  <div class="head learner-dashboard-hero">
+    <div><h1>Good to see you,<br><em>{{ me.name.split()[0] }}.</em></h1><p>Build confidence with focused practice, useful feedback, and a stronger resume.</p></div>
+    <div class="head-actions">
+      <a class="btn ghost" href="/resume">Resume ATS</a>
+      <a class="btn primary" href="/interview">Start practicing</a>
+    </div>
+  </div>
+
+  <div class="stats learner-stats">
+    <div><small>Interviews completed</small><b>{{ stats[0] }}</b></div>
+    <div><small>Average interview score</small><b>{{ "%.0f"|format(stats[1]) }}<i>/100</i></b></div>
+    <div><small>Resume versions saved</small><b>{{ stats[2] }}</b></div>
+  </div>
+
+  <div class="grid learner-tools">
+    <section class="panel learner-tool-card">
+      <div class="learner-card-heading"><span class="creator-step">01</span><div><label>CREATOR SECTION</label><h2>Your section</h2></div></div>
+      {% if section %}
+      <div class="section-connected"><span class="connected-dot"></span><span><small>CONNECTED</small><b>{{ section.name }}</b></span></div>
+      <p class="learner-card-note">Creator interview codes are available in the Interview Practice area.</p>
+      <a class="btn ghost wide" href="/interview">Open interview practice</a>
+      {% else %}
+      <p class="learner-card-note">Join your Creator's section to use their interview access codes. You can still practice on your own without a code.</p>
+      <form class="learner-form" method="post" action="/student/join">
+        <label>Student section code<input name="join_code" placeholder="Enter code from your Creator" maxlength="32" required></label>
+        <button class="btn primary wide">Join section</button>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="panel learner-tool-card learner-practice-card">
+      <div class="learner-card-heading"><span class="creator-step creator-step-alt">02</span><div><label>INTERVIEW PRACTICE</label><h2>Practice your way</h2></div></div>
+      <p class="learner-card-note">Choose an active Creator interview code after joining a section, or start a personal practice session with no code.</p>
+      <a class="btn primary wide" href="/interview">Choose a practice mode</a>
+      <div class="learner-card-foot">Your answers and results are saved to your account.</div>
+    </section>
+
+    <section class="panel learner-tool-card learner-resume-card">
+      <div class="learner-card-heading"><span class="creator-step creator-step-alt">03</span><div><label>RESUME ATS</label><h2>Your resume check</h2></div></div>
+      {% if latest_resume %}
+      <div class="dashboard-resume-score"><b>{{ "%.0f"|format(latest_resume.ats_score or 0) }}</b><span>/100</span><small>ATS-style score</small></div>
+      <p class="learner-card-note">{{ latest_resume.filename }}<br>Last checked {{ latest_resume.ats_checked_at or latest_resume.created_at }}</p>
+      <div class="head-actions"><a class="btn ghost" href="/resume">View resumes</a><form method="post" action="/resume/{{ latest_resume.id }}/recheck"><button class="btn primary">Recheck ATS</button></form></div>
+      {% else %}
+      <p class="learner-card-note">Upload a PDF resume to save it and get your first ATS-style score.</p>
+      <a class="btn primary wide" href="/resume">Upload a resume</a>
+      {% endif %}
+    </section>
+  </div>
+
+  <section class="panel learner-history">
+    <div class="learner-history-heading"><div><label>YOUR PROGRESS</label><h2>Recent interviews</h2></div><a class="btn ghost small" href="/profile">Performance profile</a></div>
+    {% for interview in recent %}
+    <a class="row learner-history-row" href="/result/{{ interview.id }}">
+      <span class="history-star">✦</span>
+      <div><b>{{ interview.branch }} · {{ interview.level }}</b><small>{{ interview.mode }} · {{ interview.completed_at or 'In progress' }}</small></div>
+      <strong>{{ "%.0f"|format(interview.score or 0) }}%</strong>
+    </a>
+    {% else %}
+    <p class="empty">Your completed and in-progress interviews will appear here.</p>
+    {% endfor %}
+  </section>
+</section>
+{% endblock %}

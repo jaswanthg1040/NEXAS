@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}NEXAs AI Interview{% endblock %}</title>
+<link rel="stylesheet" href="{{url_for('static',filename='style.css',v=2)}}"><link rel="stylesheet" href="{{url_for('static',filename='upgrade.css',v=8)}}"><link rel="stylesheet" href="{{url_for('static',filename='anime.css')}}">
+</head><body><div class="bg-grid"></div><div class="aurora"></div><div class="snow" id="snow"></div>
+<nav><span class="brand brand-static" aria-label="NEXAs">NEXAs</span><div class="navlinks">{% if request.endpoint in ['master_page', 'master_login'] %}{% if me %}<a class="pill" href="/logout">Logout</a>{% endif %}{% else %}{% if me %}{% if me.role=='master' %}<a href="/master">Master</a>{% elif me.role!='admin' %}<a href="/dashboard">Dashboard</a><a href="/interview">Interview</a><a href="/profile">Performance</a>{% endif %}{% if is_master and me.role!='master' %}<a href="/master">Master</a>{% endif %}<a class="pill" href="/logout">Logout</a>{% else %}<a href="/login">Login</a><a class="pill" href="/register">Get started</a>{% endif %}{% endif %}</div></nav>
+{% with ms=get_flashed_messages(with_categories=true) %}{% for c,m in ms %}<div class="flash {{c}}">{{m}}</div>{% endfor %}{% endwith %}
+<main>{% block content %}{% endblock %}</main>
+<button id="fab" aria-label="Open NEXAs assistant"><span>✦</span></button><aside id="help"><header><span>✦ NEXAs Quick Doubts</span><button id="hc">×</button></header><div id="hb"><p>Ask about OTP, access codes, interviews, voice/video, strict scoring or reports.</p></div><form id="hf"><input id="hi" placeholder="Ask NEXAs..."><button>Send</button></form></aside>
+<script src="{{url_for('static',filename='script.js',v=2)}}"></script><script src="{{url_for('static',filename='upgrade.js',v=2)}}"></script><script src="{{url_for('static',filename='anime.js')}}"></script></body></html>
