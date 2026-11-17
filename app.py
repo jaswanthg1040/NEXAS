@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-change-me")
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000
-DB = os.getenv("NEXA_DB", "data.db")
+DB = os.getenv("NEXA_DB", "/tmp/nexa.db")
 
 # These are the actual interview branches in NEXA.
 BRANCHES = ["AIML", "CSE", "Data Science", "Cyber Security", "ECE", "EEE"]
@@ -148,11 +148,14 @@ def now():
 
 
 def db():
+    db_dir = os.path.dirname(DB)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     c.execute("PRAGMA foreign_keys=ON")
     return c
-
 
 def table_columns(c, table):
     return {r[1] for r in c.execute(f"PRAGMA table_info({table})").fetchall()}

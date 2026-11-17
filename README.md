@@ -62,7 +62,7 @@ Copy `.env.example` to `.env`. The `.env` file is ignored by Git; do not commit 
 | Variable | Purpose |
 | --- | --- |
 | `SECRET_KEY` | Flask session-signing key. Set a long, unique random value. The built-in fallback is for local development only. |
-| `NEXA_DB` | SQLite database path; defaults to `data.db` in the current working directory. |
+| `NEXA_DB` | SQLite database path; defaults to `/tmp/nexa.db`. Set this to a durable path for deployments where temporary storage is cleared on restart. |
 | `MASTER_EMAILS` | Comma-separated email addresses provisioned as Master accounts at startup. |
 | `MASTER_PASSWORD` | Password for the configured Master email addresses. Set a non-default password. |
 | `OPENAI_API_KEY` | Optional key for AI-assisted evaluation. Leave blank to use the local evaluator. |
@@ -116,7 +116,7 @@ When SMTP credentials are not configured, OTPs are printed to the application co
 
 The `templates/` directory contains `admin.html`, `auth.html`, `base.html`, `dashboard.html`, `error.html`, `forgot_password.html`, `home.html`, `interview_setup.html`, `login_otp.html`, `master.html`, `master_login.html`, `otp.html`, `profile.html`, `reset_password.html`, `result.html`, `resume.html`, and `take.html`.
 
-`data.db`, `.env`, `.venv/`, and Python cache files are local/runtime data and are excluded from Git. The database is initialized and migrated by `app.py` when the application starts; resume PDFs and interview records are stored in that database.
+The configured SQLite database, `.env`, `.venv/`, and Python cache files are local/runtime data and are excluded from Git. The default `/tmp/nexa.db` location is temporary on many hosts; set `NEXA_DB` to a persistent path if database contents must survive restarts. The database is initialized and migrated by `app.py` when the application starts; resume PDFs and interview records are stored in that database.
 
 ## Development and deployment notes
 
