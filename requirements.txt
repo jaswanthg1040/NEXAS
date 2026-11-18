@@ -4,3 +4,4 @@ Werkzeug
 reportlab
 pypdf
 openai
+psycopg[binary]
